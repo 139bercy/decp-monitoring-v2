@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd
 import json
 import plotly.express as px
-import plotly.graph_objects as go
 from datetime import date
+import plotly.graph_objects as go
 import foo
 
 # %%
@@ -27,11 +27,24 @@ foo.df = data
 # %%
 data_chart = data[["source", "datePublicationDonnees"]]
 data_chart = data_chart.sort_values(by="datePublicationDonnees")
-data_chart = data_chart.groupby(by=['datePublicationDonnees']).size().to_frame()
-# liste_source = data_chart["source"].unique()
+data_chart = data_chart.groupby(by=['datePublicationDonnees', "source"]).size().to_frame()
+data_chart = data_chart.reset_index()
+for x in data.source.unique():
+    data_chart[x] = data_chart[0][data_chart["source"] == x]
+data_chart.set_index("datePublicationDonnees", inplace=True)
+data_chart = data_chart[data.source.unique()]
+data_chart = data_chart.groupby(by="datePublicationDonnees").first()
+data_chart = data_chart.fillna(0)
+data_chart = data_chart.cumsum()
+data_chart = data_chart.reset_index()
+data_chart = data_chart.loc[data_chart['datePublicationDonnees'] >= "2018-01-01"]
+
 # %%
-# Load data
-fig1 = go.Figure(data=[go.Histogram(x=data_chart[0], cumulative_enabled=True)])
+
+fig1 = go.Figure()
+for i in data.source.unique():
+    fig1.add_trace(go.Scatter(x=data_chart['datePublicationDonnees'], y=data_chart[i],
+                              stackgroup='one', name=i))
 fig1.update_layout(height=680, width=800, paper_bgcolor='rgb(245,245,245)')
 
 # %%
@@ -46,16 +59,27 @@ fig2.update_layout(height=680, width=800, paper_bgcolor='rgb(245,245,245)')
 fig2.update_traces(textposition='inside', textinfo='percent+label', showlegend=False)
 
 # %%
-# st.title("Données essentielles de la commande publique")
+data_chart["total"] = data_chart.sum(axis=1)
+# %%
+historique = data_chart[["datePublicationDonnees", "total"]]
+date_vector = pd.date_range(data_chart["datePublicationDonnees"].tolist()[0],
+                            data_chart["datePublicationDonnees"].tolist()[-1]).strftime("%Y-%m-%d")
+date_vector = date_vector.to_frame().reset_index(drop=True)
+date_vector["datePublicationDonnees"] = date_vector[0]
+final_hist = date_vector.merge(historique, how="left", on="datePublicationDonnees")
+final_hist = final_hist.fillna(method='ffill')
+final_hist = final_hist["total"].tolist()
+# %%
+st.title("Données essentielles de la commande publique")
 row1_1, row1_2, row1_3, row1_4 = st.columns((1, 1, 1, 1))
 with row1_1:
     st.metric("Marchés publiés", str(len(data)))
 
 with row1_2:
-    st.write("marchés publiés les 10 derniers jours")
+    st.metric("Marchés publiés les 10 derniers jours", int(final_hist[-1]-final_hist[-10]))
 
 with row1_3:
-    st.write("marchés publiés les 365 derniers jours")
+    st.metric("Marchés publiés les 365 derniers jours", int(final_hist[-1]-final_hist[-365]))
 
 with row1_4:
     st.write("partenaires sans données depuis 10 jours")

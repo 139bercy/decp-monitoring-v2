@@ -25,6 +25,8 @@ def load_data():
 data = load_data()
 foo.df = data
 # %%
+color_set = px.colors.qualitative.Light24
+# %%
 data_chart = data[["source", "datePublicationDonnees"]]
 data_chart = data_chart.sort_values(by="datePublicationDonnees")
 data_chart = data_chart.groupby(by=['datePublicationDonnees', "source"]).size().to_frame()
@@ -38,15 +40,15 @@ data_chart = data_chart.fillna(0)
 data_chart = data_chart.cumsum()
 data_chart = data_chart.reset_index()
 data_chart = data_chart.loc[data_chart['datePublicationDonnees'] >= "2018-01-01"]
-
+# %%
+order_fig1 = data_chart.iloc[-1][1:].sort_values(ascending=False).index.tolist()
 # %%
 
 fig1 = go.Figure()
-for i in data.source.unique():
-    fig1.add_trace(go.Scatter(x=data_chart['datePublicationDonnees'], y=data_chart[i],
-                              stackgroup='one', name=i))
+for i in range(len(order_fig1)):
+    fig1.add_trace(go.Scatter(x=data_chart['datePublicationDonnees'], y=data_chart[order_fig1[i]],
+                              stackgroup='one', name=order_fig1[i], line=dict(color=color_set[i])))
 fig1.update_layout(height=680, width=800, paper_bgcolor='rgb(245,245,245)')
-
 # %%
 data_pie = data[["id", "uid", "source", "montant"]]
 data_pie = data_pie['source'].value_counts().to_frame().reset_index()
@@ -55,7 +57,8 @@ data_pie = data_pie.rename(columns={"index": "Source", "source": "Nombre de marc
 
 fig2 = px.pie(data_pie, values="Nombre de marchés", names="Source", hole=0.5)
 fig2.update_layout(height=680, width=800, paper_bgcolor='rgb(245,245,245)')
-fig2.update_traces(textposition='inside', textinfo='percent+label', showlegend=False)
+fig2.update_traces(textposition='inside', textinfo='percent+label', showlegend=False,
+                   direction="clockwise", marker=dict(colors=color_set[:len(data.source.unique())]))
 
 # %%
 data_chart["total"] = data_chart.sum(axis=1)

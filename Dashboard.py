@@ -53,8 +53,7 @@ data_pie = data_pie['source'].value_counts().to_frame().reset_index()
 data_pie = data_pie.rename(columns={"index": "Source", "source": "Nombre de marchés"})
 # %%
 
-fig2 = px.pie(data_pie, values="Nombre de marchés", names="Source", hole=0.5,
-              title='Répartition des marchés par source')
+fig2 = px.pie(data_pie, values="Nombre de marchés", names="Source", hole=0.5)
 fig2.update_layout(height=680, width=800, paper_bgcolor='rgb(245,245,245)')
 fig2.update_traces(textposition='inside', textinfo='percent+label', showlegend=False)
 
@@ -72,6 +71,26 @@ final_hist = final_hist["total"].tolist()
 # %%
 st.title("Données essentielles de la commande publique")
 row1_1, row1_2, row1_3, row1_4 = st.columns((1, 1, 1, 1))
+
+st.markdown("""
+<style>
+div[data-testid="metric-container"] {
+   background-color: rgb(245, 245, 245);
+   border: 1px solid rgb(245, 245, 245);
+   padding: 5% 5% 5% 10%;
+   border-radius: 5px;
+   overflow-wrap: break-word;
+}
+
+/* breakline for metric text         */
+div[data-testid="metric-container"] > label[data-testid="stMetricLabel"] > div {
+   overflow-wrap: break-word;
+   white-space: break-spaces;
+   color: rgb(255, 75, 75);
+}
+</style>
+""", unsafe_allow_html=True)
+
 with row1_1:
     st.metric("Marchés publiés", str(len(data)))
 
@@ -82,14 +101,14 @@ with row1_3:
     st.metric("Marchés publiés les 365 derniers jours", int(final_hist[-1]-final_hist[-365]))
 
 with row1_4:
-    st.write("partenaires sans données depuis 10 jours")
+    st.metric("A définir", 1)
 
 row2_1, row2_2 = st.columns((2, 2))
 
 with row2_1:
-    # st.header("Evolution du nombre de marchés par source")
-    st.plotly_chart(fig1, height=680, width=800)
+    st.header("Evolution du nombre de marchés")
+    st.plotly_chart(fig1)
 
 with row2_2:
-    # st.header('Répartition des marchés par source')
-    st.plotly_chart(fig2, height=680, width=800)
+    st.header('Répartition des marchés par source')
+    st.plotly_chart(fig2)

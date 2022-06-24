@@ -1,3 +1,4 @@
+# %% Importations
 import streamlit as st
 import pandas as pd
 import json
@@ -6,10 +7,13 @@ from datetime import date
 import plotly.graph_objects as go
 import foo
 
-# %%
+
+# %% Définition des variables globales et paramètres
+# %%% Configuration des paramètres globaux des pages du streamlit
 st.set_page_config(layout="wide", initial_sidebar_state="collapsed")
 
 
+# %%% Importation et mise en cache des données
 @st.cache
 def load_data():
     with open("data/decp.json", 'r+') as f:
@@ -24,26 +28,28 @@ def load_data():
 
 data = load_data()
 foo.df = data
-# %%
+# foo pour que le df soit disponnible sur les autres pages également
+
+# %%% Récupération d'une liste de couleurs
 color_set = px.colors.qualitative.Light24
-# %%
-data_chart = data[["source", "datePublicationDonnees"]]
-data_chart = data_chart.sort_values(by="datePublicationDonnees")
+
+# %% FIG 1
+# %%% Création d'un DF de stock cumulatif du nombre de marchés par source pour FIG1
+data_chart = data[["source", "datePublicationDonnees"]].sort_values(by="datePublicationDonnees")
 data_chart = data_chart.groupby(by=['datePublicationDonnees', "source"]).size().to_frame()
 data_chart = data_chart.reset_index()
 for x in data.source.unique():
     data_chart[x] = data_chart[0][data_chart["source"] == x]
 data_chart.set_index("datePublicationDonnees", inplace=True)
-data_chart = data_chart[data.source.unique()]
-data_chart = data_chart.groupby(by="datePublicationDonnees").first()
-data_chart = data_chart.fillna(0)
-data_chart = data_chart.cumsum()
-data_chart = data_chart.reset_index()
+data_chart = data_chart[data.source.unique()].groupby(by="datePublicationDonnees").first()
+data_chart = data_chart.fillna(0).cumsum().reset_index()
 data_chart = data_chart.loc[data_chart['datePublicationDonnees'] >= "2018-01-01"]
-# %%
-order_fig1 = data_chart.iloc[-1][1:].sort_values(ascending=False).index.tolist()
-# %%
+# Pour le graph 1, on ne prend en compte que les marchés publiés à partir de 2018 pour des
+# questions de lisibilité
 
+# %%% Triage de la dernière ligne de data_chart afin de savoir dans quel ordre afficher les courbes
+order_fig1 = data_chart.iloc[-1][1:].sort_values(ascending=False).index.tolist()
+# %%% Création du graphique FIG1
 fig1 = go.Figure()
 for i in range(len(order_fig1)):
     fig1.add_trace(go.Scatter(x=data_chart['datePublicationDonnees'], y=data_chart[order_fig1[i]],
@@ -78,20 +84,20 @@ fig1.update_layout(height=680, width=800, paper_bgcolor='rgb(245,245,245)', xaxi
     )
 )
 
-# %%
+# %% FIG 2
+# %%% Création du dataframe source pour FIG 2
 data_pie = data[["id", "uid", "source", "montant"]]
 data_pie = data_pie['source'].value_counts().to_frame().reset_index()
 data_pie = data_pie.rename(columns={"index": "Source", "source": "Nombre de marchés"})
-# %%
 
+# %%% Création de FIG 2
 fig2 = px.pie(data_pie, values="Nombre de marchés", names="Source", hole=0.5)
 fig2.update_layout(height=680, width=800, paper_bgcolor='rgb(245,245,245)')
 fig2.update_traces(textposition='inside', textinfo='percent+label', showlegend=False,
                    direction="clockwise", marker=dict(colors=color_set[:len(data.source.unique())]))
 
-# %%
+# %% Historisation du nombre de marchés pour stats des
 data_chart["total"] = data_chart.sum(axis=1)
-# %%
 historique = data_chart[["datePublicationDonnees", "total"]]
 date_vector = pd.date_range(data_chart["datePublicationDonnees"].tolist()[0],
                             data_chart["datePublicationDonnees"].tolist()[-1]).strftime("%Y-%m-%d")
@@ -100,7 +106,7 @@ date_vector["datePublicationDonnees"] = date_vector[0]
 final_hist = date_vector.merge(historique, how="left", on="datePublicationDonnees")
 final_hist = final_hist.fillna(method='ffill')
 final_hist = final_hist["total"].tolist()
-# %%
+# %% Création de la Page 1 du Streamlit
 st.title("Données essentielles de la commande publique")
 row1_1, row1_2, row1_3, row1_4 = st.columns((1, 1, 1, 1))
 

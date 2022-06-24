@@ -1,11 +1,12 @@
+# %% Importations
 import streamlit as st
 from datetime import date
 import foo
-# %%
+# %% Configuration des paramètres globaux et importation du df de base
 st.set_page_config(layout="wide", initial_sidebar_state="expanded")
 df = foo.df
 variables = df.columns.tolist()
-# %% SIDEBAR
+# %% Création de la sidebar de paramètres ans streamlit
 st.sidebar.title("Options de Tri de la Table")
 with st.sidebar:
 
@@ -35,11 +36,14 @@ with layout[0]:
 
 with layout[-1]:
     dat_fin = st.date_input("Date de fin", date.today())
-# %%
+    
+# %% Dataframe
+# %%% Création du Dataframe à partir de df en fonction des paramètres de la sidebar
 df = df[(df['datePublicationDonnees'] >= str(dat_deb)) &
         (df['datePublicationDonnees'] <= str(dat_fin))]
 df = df[df['source'].isin(sel_sources)].reset_index(drop=True)
 df = df[sel_variables]
 st.header(f"Nombre de Marchés dans le DataFrame sélectionne: {len(df)}")
 df = df.loc[0:number_of_line]
+# %%% Affichage du dataframe dans streamlit
 st.dataframe(df)

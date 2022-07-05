@@ -94,7 +94,7 @@ fig1.update_layout(paper_bgcolor='rgb(245,245,245)', xaxis=dict(
 
 # %% FIG 2
 # %%% Création du dataframe source pour FIG 2
-data_pie = data[["id", "uid", "source", "montant"]]
+data_pie = data[["source"]]
 data_pie = data_pie['source'].value_counts().to_frame().reset_index()
 data_pie = data_pie.rename(columns={"index": "Source", "source": "Nombre de marchés"})
 
@@ -139,7 +139,7 @@ div[data-testid="metric-container"] > label[data-testid="stMetricLabel"] > div {
 """, unsafe_allow_html=True)
 
 with row1_1:
-    st.metric("Marchés publiés", str(len(data)))
+    st.metric("Marchés publiés", len(data))
 
 with row1_2:
     st.metric("Marchés publiés les 10 derniers jours", int(final_hist[-1]-final_hist[-10]))
@@ -148,7 +148,7 @@ with row1_3:
     st.metric("Marchés publiés les 365 derniers jours", int(final_hist[-1]-final_hist[-365]))
 
 with row1_4:
-    st.metric("A définir", 1)
+    st.metric("Nombre de sources", len(data.source.unique()))
 
 row2_1, row2_2 = st.columns((1, 1))
 

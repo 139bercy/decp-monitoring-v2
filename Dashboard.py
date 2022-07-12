@@ -3,7 +3,6 @@ import streamlit as st
 import pandas as pd
 import json
 import plotly.express as px
-from datetime import date
 import plotly.graph_objects as go
 
 
@@ -27,13 +26,9 @@ st.markdown("""
 # %%% Importation et mise en cache des données
 @st.cache
 def load_data():
-    with open("data/decp.json", 'r+') as f:
+    with open("data/decp_extracted.json", 'r+') as f:
         data_json = json.load(f)
-    data_json = data_json["marches"]
     data = pd.DataFrame.from_dict(data_json)
-    data = data.astype(str)
-    data = data.loc[data['datePublicationDonnees'] >= "2016-01-01"]
-    data = data.loc[data['datePublicationDonnees'] <= str(date.today())]
     return data
 
 

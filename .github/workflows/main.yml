@@ -20,10 +20,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    outputs:
-      cache-key: ${{ steps.cache.outputs.KEY }}
     container:
-      image: 'Dockerfile'
+      image: 139bercy/decp-monitoring-v2
     steps:
     - 
       name: Checkout

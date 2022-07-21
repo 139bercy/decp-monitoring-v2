@@ -25,5 +25,12 @@ jobs:
     - 
       name: Création de decp_extracted.json
       run: python json_to_metajson.py
-  
-  
+      
+    -
+      name: Test
+      run: ls
+    - name: Test2
+      run: cd data/ && ls 
+    -
+      name: Push
+      run: git config --global user.email "farcymarius@gmail.com" && git add * && git commit -m "Mise à jour automatique des données" && git push

@@ -23,7 +23,7 @@ jobs:
     outputs:
       cache-key: ${{ steps.cache.outputs.KEY }}
     container:
-      image: 139bercy/decp-rama
+      image: 139bercy/decp-monitoring-v2
     steps:
     - 
       name: Checkout

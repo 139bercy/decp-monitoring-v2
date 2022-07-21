@@ -1,0 +1,35 @@
+name: Docker Image CI
+
+on:
+  schedule:
+      - cron: '*/5 * * * *'
+  workflow_dispatch:
+    inputs:
+      cache-key-suffix:
+        description: Suffixe clé de cache (0 par défaut)
+        type: string
+        required: true
+        default: '0'
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - 'main'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.cache.outputs.KEY }}
+    container:
+      image: 139bercy/decp-rama
+    steps:
+    - 
+      name: Checkout
+      uses: actions/checkout@v2
+    - 
+      name: Build the Docker image
+      run: docker build . --file Dockerfile --tag docker_test:$(date +%s)
+  
+  

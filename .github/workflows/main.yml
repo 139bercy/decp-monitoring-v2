@@ -27,11 +27,12 @@ jobs:
       name: Checkout
       uses: actions/checkout@v2
     -
-      name: Login to Docker Hub
+      name: Login to GitHub Container Registry
       uses: docker/login-action@v2
       with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     - 
       name: Récupération des données
       run: wget -O data/decp.json https://www.data.gouv.fr/fr/datasets/r/16962018-5c31-4296-9454-5998585496d2

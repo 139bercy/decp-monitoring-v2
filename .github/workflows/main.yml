@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Récupération et traitement journaliers des données DECP
 
 on:
   schedule:

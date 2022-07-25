@@ -33,4 +33,4 @@ jobs:
       run: cd data/ && ls 
     -
       name: Push
-      run: git config --global user.email "loldebite@gmail.com" && git add * && git commit -m "Mise à jour automatique des données" && git push
+      run: git config --global user.email "" && git add * && git commit -m "Mise à jour automatique des données" && git push

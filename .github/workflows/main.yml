@@ -1,4 +1,4 @@
-name: Récupération et traitement journaliers des données DECP
+name: Docker Image CI
 
 on:
   schedule:
@@ -27,4 +27,4 @@ jobs:
       run: python json_to_metajson.py
     -
       name: Push
-      run: git config --global user.email "farcymarius@gmail.com" && git add * && git commit -m "Mise à jour automatique des données" && git push
+      run: git config --global user.email "farcymarius@gmail.com" && git add * && git commit --allow-empty -m "Mise à jour automatique des données" && git push

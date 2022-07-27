@@ -21,7 +21,7 @@ jobs:
       uses: actions/checkout@v2
     -
       name: Dépendances
-      uses: pip install pandas datetime
+      run: pip install pandas datetime
     - 
       name: Récupération des données
       run: wget -O data/decp.json https://www.data.gouv.fr/fr/datasets/r/16962018-5c31-4296-9454-5998585496d2

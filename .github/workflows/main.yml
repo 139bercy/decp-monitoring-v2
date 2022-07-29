@@ -12,9 +12,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    container:
-      image: 139bercy/decp
+    runs-on: 139bercy/decp
     steps:
     - 
       name: Checkout

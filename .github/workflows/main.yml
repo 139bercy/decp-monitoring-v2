@@ -1,0 +1,33 @@
+name: Mise à jour journalière des données
+
+on:
+  schedule:
+      - cron: '0 0 * * *'
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - 'main'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: 139bercy/decp
+    steps:
+    - 
+      name: Checkout
+      uses: actions/checkout@v2
+    -
+      name: Dépendances
+      run: pip install pandas datetime
+    - 
+      name: Récupération des données
+      run: wget -O data/decp.json https://www.data.gouv.fr/fr/datasets/r/16962018-5c31-4296-9454-5998585496d2
+    - 
+      name: Création de decp_extracted.json
+      run: python json_to_metajson.py
+    -
+      name: Push
+      run: git config --global user.email "farcymarius@gmail.com" && git add * && git commit --allow-empty -m "Mise à jour journalière des données" && git push

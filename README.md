@@ -9,7 +9,7 @@ Si le fichier d'input est un CSV (comme le résultat de decp-augmente par exempl
 
 **1. ETAPE METADATA**
 
-Afin de réduire la quantité d'informations envoyées sur Github et sur Streamlit, le script json_to_metajson permet de réduire l'information présente dans decp.json aux colonnes qui nous intéressent pour produire nos graphiques.
+Afin de réduire la quantité d'informations envoyées sur Github et sur Streamlit, le script json_to_metajson.py permet de réduire l'information présente dans decp.json aux colonnes qui nous intéressent pour produire nos graphiques.
 
 **3. ETAPE STREAMLIT**
 
@@ -19,3 +19,6 @@ Dans le script python Dashboard.py, on spécifie les graphiques et mises en page
 
 Afin que le site streamlit (https://achazryus-decp-monitoring-v2-dashboard-vmy2o6.streamlitapp.com/) soit mis à jour tous les jours, une CI a été mise en place. Celle-ci effectue les étapes suivantes toutes les 24h :
 - Déploiement d'une image Dockers (139bercy/decp)
+- Récupération des données en ligne via wget
+- Exécution du script json_to_metajson.py
+- Commit du fichier de données pour que le repo Github porte les données metadata
